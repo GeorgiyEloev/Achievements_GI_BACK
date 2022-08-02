@@ -1,20 +1,24 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
-import { DoneModule } from './done/done.module';
-import { AppController } from './app.controller';
-import { AchievementsModule } from './achievements/achievements.module';
+import { typeOrmModuleOptions } from './config/orm.config';
+import { AchievementsModule } from './modules/achievements/achievements.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env'],
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        ...typeOrmModuleOptions,
+      }),
+    }),
     UserModule,
     AchievementsModule,
-    DoneModule,
-    MongooseModule.forRoot(process.env.MONGODB_URL),
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
